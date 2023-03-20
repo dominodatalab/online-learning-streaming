@@ -4,6 +4,8 @@ from confluent_kafka import TopicPartition,Producer,Consumer
 import os
 
 
+import logging
+logging.basicConfig(level=logging.INFO)
 
 
 feature_topic=os.environ['FEATURE_TOPIC_NAME']
@@ -140,13 +142,16 @@ def predict(x):
     print(model_score)
     return dict(score=str(model_score),features=x,count=cnt)
 
-def init():
-   
+def init():   
     global inference_group_id
-    #cf = threading.Thread(target=consume_features, args=(inference_group_id,))
-    #cf.start()
+    cf = threading.Thread(target=consume_features, args=(inference_group_id,))
+    cf.start()
     consume_features(inference_group_id)
     print('Feature Consumption Thread Started')
     #consume_features(inference_group_id)
-print('about to start--------')
+
+print('Sleeping for 10 seconds')
+time.sleep(10)
+
 init()
+print('started')
