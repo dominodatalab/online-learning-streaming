@@ -151,5 +151,5 @@ def init():
     
     print('Feature Consumption Thread Started')
     #consume_features(inference_group_id)
-print('about to start')
+print('about to start--------')
 init()
