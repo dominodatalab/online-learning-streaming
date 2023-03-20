@@ -72,8 +72,8 @@ def consume_features(group_id:str):
                      'security.protocol': 'SASL_SSL',
                      'ssl.ca.location': certifi.where(),
                      'group.id': group_id,
-                     'enable.auto.commit': False,
-                     'auto.offset.reset': 'earliest'}
+                     'enable.auto.commit': True,
+                     'auto.offset.reset': 'latest'}
     features_consumer = Consumer(features_consumer_conf)    
     print(f'\nNow subscribing to features topic {feature_topic}')
     features_consumer.subscribe([feature_topic])
@@ -144,6 +144,7 @@ def predict(x):
 
 def init():   
     global inference_group_id
+    time.sleep(10)
     cf = threading.Thread(target=consume_features, args=(inference_group_id,))
     cf.start()
     consume_features(inference_group_id)
