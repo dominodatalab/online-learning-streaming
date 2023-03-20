@@ -31,7 +31,7 @@ from river import ensemble
 from river import evaluate
 from river import compose
 from river import naive_bayes
-from time import time
+
 
 from river import anomaly
 from river import compose
@@ -57,6 +57,7 @@ def return_range(strg, loc, toks):
 model = tree.HoeffdingAdaptiveTreeClassifier(grace_period=100,  delta=1e-5, leaf_prediction='nb', nb_threshold=10,seed=0)    
 cnt = 0
 def consume_features(group_id:str):  
+    ignored = 0
     global cnt
     global latest_version
     global model
