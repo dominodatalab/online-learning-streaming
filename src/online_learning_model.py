@@ -89,7 +89,7 @@ def consume_features(group_id:str):
     msg = None
  
     while(True):
-        print('Start Processing)
+        print('Start Processing')
         msg = features_consumer.poll(timeout=0.1)
         if msg is None: continue
         if msg.error():
