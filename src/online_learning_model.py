@@ -61,7 +61,7 @@ def consume_features(group_id:str):
     global KAFKA_USER_NAME
     global KAFKA_PASSWORD
     global KAFKA_BOOTSTRAP_SERVERS
-    print('Initialized')
+    print('Initialized ')
     #Only one model instance recieves the message (Each has the SAME consumer group)
     features_consumer_conf = {'bootstrap.servers': KAFKA_BOOTSTRAP_SERVERS,
                      'sasl.username': KAFKA_USER_NAME,
@@ -151,5 +151,5 @@ def init():
     
     print('Feature Consumption Thread Started')
     #consume_features(inference_group_id)
-
+print('about to start')
 init()
