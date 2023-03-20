@@ -53,8 +53,9 @@ def return_range(strg, loc, toks):
 
 
 model = tree.HoeffdingAdaptiveTreeClassifier(grace_period=100,  delta=1e-5, leaf_prediction='nb', nb_threshold=10,seed=0)    
-
+cnt = 0
 def consume_features(group_id:str):  
+    global cnt
     global latest_version
     global model
     global KAFKA_USER_NAME
@@ -86,8 +87,9 @@ def consume_features(group_id:str):
     predictions_producer = Producer(producer_conf)
     
     msg = None
-    cnt = 0
+ 
     while(True):
+        print('Start Processing)
         msg = features_consumer.poll(timeout=0.1)
         if msg is None: continue
         if msg.error():
@@ -130,7 +132,7 @@ def predict(x):
     global model
     model_score = model.predict_one(x)
     print(model_score)
-    return dict(score=str(model_score),features=x)
+    return dict(score=str(model_score),features=x,count=cnt)
 
 def init():
     global inference_group_id
