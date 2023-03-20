@@ -129,7 +129,7 @@ def consume_features(group_id:str):
 def predict(x):
     global model
     model_score = model.predict_one(x)
-    return dict(score=model_score,features=data)
+    return dict(score=model_score,features=x)
 
 def init():
     global inference_group_id
