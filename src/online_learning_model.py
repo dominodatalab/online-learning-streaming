@@ -70,8 +70,8 @@ def consume_features(group_id:str):
                      'security.protocol': 'SASL_SSL',
                      'ssl.ca.location': certifi.where(),
                      'group.id': group_id,
-                     'enable.auto.commit': True,
-                     'auto.offset.reset': 'latest'}
+                     'enable.auto.commit': False,
+                     'auto.offset.reset': 'earliest'}
     features_consumer = Consumer(features_consumer_conf)    
     print(f'\nNow subscribing to features topic {feature_topic}')
     features_consumer.subscribe([feature_topic])
@@ -88,11 +88,8 @@ def consume_features(group_id:str):
     
     msg = None
     error_cnt = 0
-    while(True):   
-        print('READING')
-        msg = features_consumer.poll(timeout=0.1)
-        print('READ')
-        print(msg)
+    while(True):           
+        msg = features_consumer.poll(timeout=1.0)                
         if msg is None: continue
         if msg.error():
             error_cnt = error_cnt + 1
