@@ -87,13 +87,17 @@ def consume_features(group_id:str):
     predictions_producer = Producer(producer_conf)
     
     msg = None
- 
-    while(True):
-        print('Start Processing')
+    error_cnt = 0
+    while(True):        
         msg = features_consumer.poll(timeout=0.1)
         if msg is None: continue
         if msg.error():
+            error_cnt = error_cnt + 1
             if msg.error().code() == KafkaError._PARTITION_EOF:
+                    
+                    if(error_cnt%1000==0):
+                        print('error')
+                        print(msg)
                     sys.stderr.write('%% %s [%d] reached end at offset %d\n' %
                                          (msg.topic(), msg.partition(), msg.offset()))
         else:        
@@ -129,12 +133,14 @@ def consume_features(group_id:str):
 
 
 def predict(x):
+    global cnt
     global model
     model_score = model.predict_one(x)
     print(model_score)
     return dict(score=str(model_score),features=x,count=cnt)
 
 def init():
+   
     global inference_group_id
     cf = threading.Thread(target=consume_features, args=(inference_group_id,))
     cf.start()
