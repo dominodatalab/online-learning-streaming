@@ -2,7 +2,7 @@
 import random
 from confluent_kafka import TopicPartition,Producer,Consumer
 import os
-
+import traceback
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -31,7 +31,7 @@ from river import ensemble
 from river import evaluate
 from river import compose
 from river import naive_bayes
-from time import time
+
 
 from river import anomaly
 from river import compose
@@ -54,12 +54,14 @@ def return_range(strg, loc, toks):
 
 
 
-model = tree.HoeffdingAdaptiveTreeClassifier(grace_period=100,  delta=1e-5, leaf_prediction='nb', nb_threshold=10,seed=0)    
+model_artifact = tree.HoeffdingAdaptiveTreeClassifier(grace_period=100,  delta=1e-5, leaf_prediction='nb', nb_threshold=10,seed=0)    
 cnt = 0
+import sys
 def consume_features(group_id:str):  
+    ignored = 0
     global cnt
     global latest_version
-    global model
+    global model_artifact
     global KAFKA_USER_NAME
     global KAFKA_PASSWORD
     global KAFKA_BOOTSTRAP_SERVERS
@@ -72,7 +74,7 @@ def consume_features(group_id:str):
                      'security.protocol': 'SASL_SSL',
                      'ssl.ca.location': certifi.where(),
                      'group.id': group_id,
-                     'enable.auto.commit': True,
+                     'enable.auto.commit': False,
                      'auto.offset.reset': 'latest'}
     features_consumer = Consumer(features_consumer_conf)    
     print(f'\nNow subscribing to features topic {feature_topic}')
@@ -91,68 +93,71 @@ def consume_features(group_id:str):
     msg = None
     error_cnt = 0
     while(True):           
-        msg = features_consumer.poll(timeout=1.0)                
+        msg = features_consumer.poll(timeout=0.1)                
         if msg is None: continue
         if msg.error():
             error_cnt = error_cnt + 1
             if msg.error().code() == KafkaError._PARTITION_EOF:
                     
                     if(error_cnt%1000==0):
+                        #features_consumer.commit()
                         print('error')
                         print(msg)
                     sys.stderr.write('%% %s [%d] reached end at offset %d\n' %
                                          (msg.topic(), msg.partition(), msg.offset()))
-        else:        
-            message = json.loads(msg.value().decode("utf-8"))
-            if(cnt%10000==0):
-                print(message)
-            cnt = cnt + 1
+        else:       
+            try:         
+                message = json.loads(msg.value().decode("utf-8"))            
+                if(cnt%10000==0):
+                    print(message)
+                cnt = cnt + 1
+                if(cnt%1000==0):
+                    print(f'Sanity check {cnt}')
+                st = message['st']
+                f = message['f']
+                y = (message['y']=='true')              
+            
                 
-            st = message['st']
-            data = message['f']
-            y = (message['y']=='true')              
-            try:                    
-                score = model.predict_one(data)
-                model = model.learn_one(data,y)                    
-                end = time()
-                message['score']=score
-                message['duration']=(end-st)
+                score = model_artifact.predict_one(f)
+                model_artifact = model_artifact.learn_one(f,y)                    
+                end = time.time()
                 new_message = {}
                 new_message['y']=(message['y']=='true')          
                 new_message['score']=score
                 new_message['duration']=(end-st)
-                new_message['mem_usage']=model._raw_memory_usage
-                v= json.dumps(new_message).encode('utf-8')
+                new_message['mem_usage']=model_artifact._raw_memory_usage
                 try:
-                    predictions_producer.produce(PREDICTION_TOPIC, value=v, key=str(cnt))
+                    predictions_producer.produce(PREDICTION_TOPIC, value=json.dumps(new_message).encode('utf-8'), key=str(cnt))
                 except:
                     print(f'Queue full, flushing {cnt}')
-                    producer.flush()
-            except:
-                print('ignored')
+                    predictions_producer.flush()
+                    features_consumer.commit()
+            except Exception as  e:      
+                print(json.loads(msg.value().decode("utf-8")))
+                print(e, file=sys.stdout)
                 ignored = ignored + 1
+                print(f'ignored ={ignored} total = {cnt}')
+                
     print('CLOSING')
-    consumer.close()    
+    features_consumer.commit()
+    features_consumer.close()    
 
 
 def predict(x):
     global cnt
-    global model
-    model_score = model.predict_one(x)
+    global model_artifact
+    model_score = model_artifact.predict_one(x)
     print(model_score)
     return dict(score=str(model_score),features=x,count=cnt)
 
 def init():   
     global inference_group_id
-    time.sleep(10)
     cf = threading.Thread(target=consume_features, args=(inference_group_id,))
     cf.start()
-    consume_features(inference_group_id)
-    print('Feature Consumption Thread Started')
     #consume_features(inference_group_id)
-
+import time
 print('Sleeping for 10 seconds')
-
+time.sleep(1)
 
 init()
 print('started')
