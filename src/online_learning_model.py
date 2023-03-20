@@ -88,8 +88,11 @@ def consume_features(group_id:str):
     
     msg = None
     error_cnt = 0
-    while(True):        
+    while(True):   
+        print('READING')
         msg = features_consumer.poll(timeout=0.1)
+        print('READ')
+        print(msg)
         if msg is None: continue
         if msg.error():
             error_cnt = error_cnt + 1
@@ -101,8 +104,6 @@ def consume_features(group_id:str):
                     sys.stderr.write('%% %s [%d] reached end at offset %d\n' %
                                          (msg.topic(), msg.partition(), msg.offset()))
         else:        
-            print('xxxx')
-            print(msg)
             message = json.loads(msg.value().decode("utf-8"))
             if(cnt%10000==0):
                 print(message)
@@ -123,8 +124,6 @@ def consume_features(group_id:str):
                 new_message['duration']=(end-st)
                 new_message['mem_usage']=model._raw_memory_usage
                 v= json.dumps(new_message).encode('utf-8')
-                print(PREDICTION_TOPIC)
-                print(v)
                 try:
                     predictions_producer.produce(PREDICTION_TOPIC, value=v, key=str(cnt))
                 except:
@@ -133,6 +132,7 @@ def consume_features(group_id:str):
             except:
                 print('ignored')
                 ignored = ignored + 1
+    print('CLOSING')
     consumer.close()    
 
 
