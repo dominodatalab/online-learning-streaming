@@ -2,7 +2,7 @@
 import random
 from confluent_kafka import TopicPartition,Producer,Consumer
 import os
-import time
+
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -151,7 +151,7 @@ def init():
     #consume_features(inference_group_id)
 
 print('Sleeping for 10 seconds')
-time.sleep(10)
+
 
 init()
 print('started')
