@@ -53,8 +53,10 @@ def return_range(strg, loc, toks):
         return range(int(toks[0]), int(toks[1])+1)
 
 
-
-model_artifact = tree.HoeffdingAdaptiveTreeClassifier(grace_period=100,  delta=1e-5, leaf_prediction='nb', nb_threshold=10,seed=0)    
+'''
+model_artifact = tree.HoeffdingAdaptiveTreeClassifier(grace_period=100,  delta=1e-5, leaf_prediction='nb', nb_threshold=10,seed=0) 
+'''
+model_artifact = ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")
 cnt = 0
 import sys
 def consume_features(group_id:str):  
