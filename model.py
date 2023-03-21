@@ -74,7 +74,8 @@ def consume_features(group_id:str):
                      'security.protocol': 'SASL_SSL',
                      'ssl.ca.location': certifi.where(),
                      'group.id': group_id,
-                     'enable.auto.commit': False,
+                     'enable.auto.commit': True,
+                     'auto.commit.interval.ms':10000,         
                      'auto.offset.reset': 'latest'}
     features_consumer = Consumer(features_consumer_conf)    
     print(f'\nNow subscribing to features topic {feature_topic}')
@@ -86,14 +87,19 @@ def consume_features(group_id:str):
                      'sasl.password': KAFKA_PASSWORD,
                      'sasl.mechanism': 'PLAIN',
                      'security.protocol': 'SASL_SSL',
+                     'batch.num.messages': 2048,                
+                     'linger.ms': 100,
                      'ssl.ca.location': certifi.where(),
                      'client.id': prediction_topic_suffix}    
     predictions_producer = Producer(producer_conf)
     
     msg = None
     error_cnt = 0
+    end_learn_ts = 0
+    st_learn_ts = 0
     while(True):           
-        msg = features_consumer.poll(timeout=0.1)                
+        msg = features_consumer.poll(timeout=0.1)    
+        
         if msg is None: continue
         if msg.error():
             error_cnt = error_cnt + 1
@@ -106,32 +112,38 @@ def consume_features(group_id:str):
                     sys.stderr.write('%% %s [%d] reached end at offset %d\n' %
                                          (msg.topic(), msg.partition(), msg.offset()))
         else:       
+            
             try:         
                 message = json.loads(msg.value().decode("utf-8"))            
-                if(cnt%10000==0):
-                    print(message)
+                
+                    
                 cnt = cnt + 1
-                if(cnt%1000==0):
+                if(cnt%100==0):
+                    print(str(end_learn_ts-st_learn_ts))
                     print(f'Sanity check {cnt}')
                 st = message['st']
                 f = message['f']
                 y = (message['y']=='true')              
             
-                
+                st_learn_ts = time.time()
                 score = model_artifact.predict_one(f)
-                model_artifact = model_artifact.learn_one(f,y)                    
+                model_artifact = model_artifact.learn_one(f,y)      
+                end_learn_ts = time.time()
                 end = time.time()
                 new_message = {}
                 new_message['y']=(message['y']=='true')          
                 new_message['score']=score
                 new_message['duration']=(end-st)
+                new_message['learn_ds']=(end_learn_ts-st_learn_ts)
                 new_message['mem_usage']=model_artifact._raw_memory_usage
+                
                 try:
                     predictions_producer.produce(PREDICTION_TOPIC, value=json.dumps(new_message).encode('utf-8'), key=str(cnt))
                 except:
                     print(f'Queue full, flushing {cnt}')
                     predictions_producer.flush()
                     features_consumer.commit()
+                
             except Exception as  e:      
                 print(json.loads(msg.value().decode("utf-8")))
                 print(e, file=sys.stdout)
