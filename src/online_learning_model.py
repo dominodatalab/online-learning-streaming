@@ -134,7 +134,7 @@ def consume_features(group_id:str):
                 st_learn_ts = time.time()
                 st_learn_ts = time.time()
                 score = model_artifact.predict_one(f)
-                model_artifact.learn_one(f,y)      
+                model_artifact = model_artifact.learn_one(f,y)      
                 end_learn_ts = time.time()
                 end = time.time()
                 new_message = {}
