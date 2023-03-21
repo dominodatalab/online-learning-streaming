@@ -124,6 +124,7 @@ def consume_features(group_id:str):
                 if(cnt%100==0):
                     print(str(end_learn_ts-st_learn_ts))
                     print(f'Sanity check {cnt}')
+                    predictions_producer.flush()
                 st = message['st']
                 f = message['f']
                 y = (message['y']=='true')              
