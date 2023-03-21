@@ -80,8 +80,10 @@ def consume_features(group_id:str):
                      'enable.auto.commit': True,
                      'auto.commit.interval.ms':10000,         
                      'auto.offset.reset': 'latest'}
-    features_consumer = Consumer(features_consumer_conf)    
+    features_consumer = Consumer(features_consumer_conf)  
+    print(features_consumer_conf)
     print(f'\nNow subscribing to features topic {feature_topic}')
+    return
     features_consumer.subscribe([feature_topic])
 
     
