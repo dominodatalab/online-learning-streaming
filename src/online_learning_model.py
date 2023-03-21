@@ -120,10 +120,7 @@ def consume_features(group_id:str):
             
             try:         
                 message = json.loads(msg.value().decode("utf-8"))            
-                
-                    
                 cnt = cnt + 1
-                
                 st = message['st']
                 f = message['f']
                 y = (message['y']=='true')              
@@ -172,7 +169,7 @@ def predict(x):
     global model_artifact
     model_score = model_artifact.predict_one(x)
     print(model_score)
-    return dict(score=str(model_score),features=x,count=cnt)
+    return dict(score=str(model_score),features=x,count=str(cnt), model=str(model_score))
 
 def init():   
     global inference_group_id
