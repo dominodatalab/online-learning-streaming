@@ -78,12 +78,12 @@ def consume_features(group_id:str):
                      'ssl.ca.location': certifi.where(),
                      'group.id': group_id,
                      'enable.auto.commit': True,
-                     'auto.commit.interval.ms':10000,         
+                     'auto.commit.interval.ms':1000,         
                      'auto.offset.reset': 'latest'}
     features_consumer = Consumer(features_consumer_conf)    
     print(f'\nNow subscribing to features topic {feature_topic}')
     features_consumer.subscribe([feature_topic])
-
+    print(features_consumer_conf)
     
     producer_conf = {'bootstrap.servers': KAFKA_BOOTSTRAP_SERVERS,
                      'sasl.username': KAFKA_USER_NAME,
@@ -167,9 +167,10 @@ def consume_features(group_id:str):
 def predict(x):
     global cnt
     global model_artifact
+    print(model_artifact)
     model_score = model_artifact.predict_one(x)
     print(model_score)
-    return dict(score=str(model_score),features=x,count=str(cnt), model=str(model_score))
+    return dict(score=str(model_score),features=x,count=str(cnt), model=str(model_artifact))
 
 def init():   
     global inference_group_id
