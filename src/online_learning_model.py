@@ -78,14 +78,14 @@ def consume_features(group_id:str):
                      'ssl.ca.location': certifi.where(),
                      'group.id': group_id,
                      'enable.auto.commit': True,
-                     'auto.commit.interval.ms':10000,         
+                     'auto.commit.interval.ms':1000,         
                      'auto.offset.reset': 'latest'}
     features_consumer = Consumer(features_consumer_conf)  
-    print(features_consumer_conf)
+    
     print(f'\nNow subscribing to features topic {feature_topic}')
-    return
+    
     features_consumer.subscribe([feature_topic])
-
+    
     
     producer_conf = {'bootstrap.servers': KAFKA_BOOTSTRAP_SERVERS,
                      'sasl.username': KAFKA_USER_NAME,
@@ -97,7 +97,7 @@ def consume_features(group_id:str):
                      'ssl.ca.location': certifi.where(),
                      'client.id': group_id}    
     predictions_producer = Producer(producer_conf)
-    
+    time.sleep(10)
     msg = None
     error_cnt = 0
     end_learn_ts = 0
