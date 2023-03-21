@@ -82,7 +82,7 @@ def consume_features(group_id:str):
                      'auto.offset.reset': 'latest'}
     features_consumer = Consumer(features_consumer_conf)  
     
-    print(f'\nNow subscribing to features topic {feature_topic}')
+    print(f'\nNow subscribing to features topic -{feature_topic}-')
     
     features_consumer.subscribe([feature_topic])
     
@@ -97,7 +97,8 @@ def consume_features(group_id:str):
                      'ssl.ca.location': certifi.where(),
                      'client.id': group_id}    
     predictions_producer = Producer(producer_conf)
-    time.sleep(10)
+    print('Sleeping 100 seconds')
+    time.sleep(100)
     msg = None
     error_cnt = 0
     end_learn_ts = 0
