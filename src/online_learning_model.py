@@ -84,7 +84,7 @@ def consume_features(group_id:str):
     print(f'\nNow subscribing to features topic {feature_topic}')
     features_consumer.subscribe([feature_topic])
 
-    client_id='client-1'
+    
     producer_conf = {'bootstrap.servers': KAFKA_BOOTSTRAP_SERVERS,
                      'sasl.username': KAFKA_USER_NAME,
                      'sasl.password': KAFKA_PASSWORD,
@@ -93,13 +93,15 @@ def consume_features(group_id:str):
                      'batch.num.messages': 2048,                
                      'linger.ms': 100,
                      'ssl.ca.location': certifi.where(),
-                     'client.id': prediction_topic_suffix}    
+                     'client.id': group_id}    
     predictions_producer = Producer(producer_conf)
     
     msg = None
     error_cnt = 0
     end_learn_ts = 0
     st_learn_ts = 0
+    prediction_lag = 0
+    st = 0
     while(True):           
         msg = features_consumer.poll(timeout=0.1)    
         
@@ -121,14 +123,18 @@ def consume_features(group_id:str):
                 
                     
                 cnt = cnt + 1
-                if(cnt%100==0):
-                    print(str(end_learn_ts-st_learn_ts))
-                    print(f'Sanity check {cnt}')
-                    predictions_producer.flush()
+                
                 st = message['st']
                 f = message['f']
                 y = (message['y']=='true')              
-            
+                if(cnt==1):
+                    prediction_lag = time.time()-st
+                end = time.time()
+                if(cnt%1024==0 and cnt>0):
+                    print(str(end-st-prediction_lag))
+                    print(f'Sanity check {cnt}')
+                    predictions_producer.flush()
+                st_learn_ts = time.time()
                 st_learn_ts = time.time()
                 score = model_artifact.predict_one(f)
                 model_artifact = model_artifact.learn_one(f,y)      
@@ -137,7 +143,9 @@ def consume_features(group_id:str):
                 new_message = {}
                 new_message['y']=(message['y']=='true')          
                 new_message['score']=score
-                new_message['duration']=(end-st)
+                new_message['duration']=(end-st-prediction_lag)
+                new_message['grp_id']=group_id
+                
                 new_message['learn_ds']=(end_learn_ts-st_learn_ts)
                 new_message['mem_usage']=model_artifact._raw_memory_usage
                 
