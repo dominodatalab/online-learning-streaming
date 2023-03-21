@@ -163,10 +163,14 @@ def consume_features(group_id:str):
     features_consumer.commit()
     features_consumer.close()    
 
-
+global started=False
 def predict(x):
     global cnt
     global model_artifact
+    global started
+    if(not started):
+        init()
+        started = True
     model_score = model_artifact.predict_one(x)
     print(model_score)
     return dict(score=str(model_score),features=x,count=str(cnt), model=str(model_score))
