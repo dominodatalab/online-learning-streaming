@@ -84,7 +84,7 @@ def consume_features(group_id:str):
     print(f'\nNow subscribing to features topic {feature_topic}')
     features_consumer.subscribe([feature_topic])
     print(features_consumer_conf)
-    
+    return
     producer_conf = {'bootstrap.servers': KAFKA_BOOTSTRAP_SERVERS,
                      'sasl.username': KAFKA_USER_NAME,
                      'sasl.password': KAFKA_PASSWORD,
