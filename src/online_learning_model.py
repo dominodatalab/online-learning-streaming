@@ -104,7 +104,7 @@ def consume_features(group_id:str):
     st = 0
     while(True):           
         msg = features_consumer.poll(timeout=0.1)    
-        
+        print(msg)
         if msg is None: continue
         if msg.error():
             error_cnt = error_cnt + 1
@@ -173,7 +173,7 @@ def predict(x):
         started = True
     model_score = model_artifact.predict_one(x)
     print(model_score)
-    return dict(score=str(model_score),features=x,count=str(cnt), model=str(model_score))
+    return dict(score=str(model_score),features=x,count=str(cnt), model=str(model_score),test=1)
 
 def init():   
     print('AAAAAAAAAAAAAAAAA')
