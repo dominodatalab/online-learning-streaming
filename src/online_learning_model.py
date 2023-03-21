@@ -163,7 +163,7 @@ def consume_features(group_id:str):
     features_consumer.commit()
     features_consumer.close()    
 
-global started=False
+started=False
 def predict(x):
     global cnt
     global model_artifact
@@ -176,6 +176,7 @@ def predict(x):
     return dict(score=str(model_score),features=x,count=str(cnt), model=str(model_score))
 
 def init():   
+    print('AAAAAAAAAAAAAAAAA')
     global inference_group_id
     cf = threading.Thread(target=consume_features, args=(inference_group_id,))
     cf.start()
