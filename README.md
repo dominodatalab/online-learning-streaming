@@ -123,4 +123,8 @@ Consequently, we won't be able to train and predict in the same thread. Instead 
 
 The predictions will be accompanied by the feature set and the model version used to make the predictions. Each model version will be also saved with the incremental features used to train it. These incremental features and model version will be stored in the model registry which will allow us to reproduce any prediction made.
 
-The high level architecture for this design is ![Kafka Model](assets/kafka_model.png)
+The high level architecture for this design is show below:
+
+![Kafka Model](assets/kafka_model.png)
+
+//Watch this REPO for demonstrations using the above architecture
