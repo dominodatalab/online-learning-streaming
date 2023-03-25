@@ -8,13 +8,12 @@ This repository is the official implementation of the paper **StreamMLOps: Onlin
 
 > [River](https://github.com/online-ml/river) [[1]](#1) is an open-source online machine learning library written in Python which main focus is **instance-incremental
 learning**, meaning that every component (estimators, transformers, performance metrics, etc.) is designed to be updated one sample at a time. We used River to continuously train and update online learning model from last data streams. 
-
+> The [Domino Platform](https://www.dominodatalab.com/) platform is implemented on top of Kubernetes, where
+it spins up containers on demand for running user workloads. The containers are based on Docker images, which are fully customizable. We used Domino to host the models and run scalability tests on high velocity data generated as streams. 
 > [KAFKA](https://kafka.apache.org/) is 
 a state of the art open-source distributed
-event streaming platform and we used a managed hosted Kafka ([confluent](https://www.confluent.io/). We used it as a data streams generator.
+event streaming platform and we used a managed hosted Kafka ([confluent](https://www.confluent.io/). We used Kafka as our streaming platform
 
-> The [Domino Platform](https://www.dominodatalab.com/) platform is implemented on top of Kubernetes, where
-it spins up containers on demand for running user workloads. The containers are based on Docker images, which are fully customizable. We used Domino to host the models and run scalability tests on hig velocity data generated as streams. 
 
 <img width="484" alt="technologies_used_river_domino" src="https://user-images.githubusercontent.com/27995832/113413633-6655d280-93bb-11eb-9f0d-d9674024d465.PNG">
 
