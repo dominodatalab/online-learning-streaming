@@ -1,6 +1,6 @@
 # Online Learning Deployment for Streaming Applications
 
-This repository is the official implementation of the paper **Online Learning Deployment for Streaming Applications in the Banking Sector** (Barry, Montiel, Bifet, Wadkar, Chiky, Shakman, Manchev, Halford, El Baroudi,  ICDE 2023). The ressources can be used to set up and deploy instances of online machine learning models, to generate predictions and update the model weights on streaming data.  
+This repository is the official implementation of the paper **StreamMLOps: Online Learning in Practice from Big Data Streams & Real-Time Applications** (Barry, Montiel, Bifet, Wadkar, Chiky, Shakman, Manchev, Halford, El Baroudi,  ICDE 2023). The ressources can be used to set up and deploy instances of online machine learning models, to generate predictions and update the model weights on streaming data.  
 
 > **Motivations** Our goal is to propose platform to provide a seamless bridge between data science-centric activities and data engineering activities, in a way that satisfies both the imposed production constraints in term of scalability and streaming application requirements in term of online learning. Examples of potential use cases can be anomaly and fraud detection for time-evolving data streams or real-time classification of user activities or IT or logs events. This is can be a real accelerator to gain in pro-activity for real world problems solving.
 
