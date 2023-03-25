@@ -18,7 +18,7 @@ it spins up containers on demand for running user workloads. The containers are 
 <img width="484" alt="technologies_used_river_domino" src="https://user-images.githubusercontent.com/27995832/113413633-6655d280-93bb-11eb-9f0d-d9674024d465.PNG">
 
 
-## High Level Overview 
+## Basic Experiment
 
 The notebook [MaxSustainableThroughputCalculator](src/MaxSustainableThroughputCalculator.ipynb) is a way to measure
 the maximum theoretical throughput if the cost of processing a messaging in the Kafka platform was zero.
@@ -113,3 +113,14 @@ The minimum value of `Messaging Latency` indicates the time it takes for a messa
 At this point the bottleneck becomes the `Learning Duration` which is `1.07 ms`. This establishes an absolute limit of about 900 messages per second per thread for the model `ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")` 
 
 We are sending approximately 800 messages per second to account for the messaging latency of 300 ms.
+
+## Practical Scenario
+
+In a practical scenario when Online Learning is applied to a regulated industry like Finance or Healthcare the above
+simple architecture will not work. Non-functional requirements like Explainability and Reproducibility are important.
+
+Consequently, we won't be able to train and predict in the same thread. Instead we will be training in a separate thread and publishing the model version to model registry (MLflow based Experiment Manager in Domino Data Lab Platform) and publishing the versions to all the Kafka Consumers responsible for the predictions.
+
+The predictions will be accompanied by the feature set and the model version used to make the predictions. Each model version will be also saved with the incremental features used to train it. These incremental features and model version will be stored in the model registry which will allow us to reproduce any prediction made.
+
+The high level architecture for this design is ![Kafka Model](assets/kafka_model.png)
