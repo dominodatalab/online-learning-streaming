@@ -96,7 +96,7 @@ A single thread achieves the following throughput numbers-
 |  4 | END TO END DURATION(ms)            | 973.903    | 958.406    | 1665.24     | 391.795     |
 
 
-Note how the messaging latency accounts for most of the latency. A faster and more expensive cluster will improve throughput proportionately (We process 800 records per second for the model ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")
+Note how the messaging latency accounts for most of the latency. A faster and more expensive cluster will improve throughput proportionately (We process 800 records per second for the model `ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")`
 
 The various latency metrics are explained below
 1. `MESSAGING LATENCY` - The number of milliseconds it takes for the message to arrive at a consumer after it was produced by the Kafka Producer
@@ -107,4 +107,9 @@ The various latency metrics are explained below
 
 
 
-It is important to note the minumum value of messaging latency
+The workspace we are using for the experiment is a 3 core machine. We are processing 8 Kafka Partitions in one thread.
+The minimum value of `Messaging Latency` indicates the time it takes for a message to arrive at the Consumer. This establishes the absolute minimum time it will take to process a message (400 ms). This is indepdent of the algorithm used. Once the first message arrives, the others follow with negligible incremental latency.
+
+At this point the bottleneck becomes the `Learning Duration` which is `1.07 ms`. This establishes an absolute limit of about 900 messages per second per thread for the model `ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")` 
+
+We are sending approximately 800 messages per second to account for the messaging latency of 300 ms.
