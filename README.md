@@ -69,16 +69,42 @@ This cell in the notebook throttle the number of features pushed to a topic
 feature_topic = 'features_v4'
 
 #flush_size and sleep_time throttle the number of feature records written to the feature topic per second
-flush_size=600
+flush_size=800
 sleep_time=1
 
 #Maximum number of records processed. We use a small number 5000. But a typical size would be 100000
 #In the practice, the features are arriving continuously.
 max_size=5000
-
-#Dataset used
-dataset = datasets.MaliciousURL()
-data = dataset.take(max_size)
 ```
 
+The notebook  [MaliciousURLModelConsumer](src/MaliciousURLModelConsumer.ipynb) is designed to read all the feature records published by the producer in a single thread. We carefully produce the appropriate number of records to 
+achieve sub-second response times. 
 
+If you are willing to run the training and prediction process combined in separate Kafka Consumers you can achieve
+a near linear scalability. However in this case, you need to be aware that each Consumer uses its own model version.
+
+A single thread achieves the following throughput numbers-
+
+
+
+|    | Type of durations                   |       MEAN |     MEDIAN |     MAXIMUM |     MINIMUM |
+|---:|:------------------------------------|-----------:|-----------:|------------:|------------:|
+|  0 | MESSAGING LATENCY(ms)               | 972.558    | 956.883    | 1663.33     | 390.412     |
+|  1 | PROCESSING DURATION ON ARRIVAL(ms) |   1.34578  |   1.28746  |   42.8333   |   0.345469  |
+|  2 | PREDICTION DURATION ON ARRIVAL(ms) |   0.175217 |   0.167131 |    0.539541 |   0.0786781 |
+|  3 | LEARNING DURATION ON ARRIVAL(ms)   |   1.13075  |   1.07217  |   42.6424   |   0.233173  |
+|  4 | END TO END DURATION(ms)            | 973.903    | 958.406    | 1665.24     | 391.795     |
+
+
+Note how the messaging latency accounts for most of the latency. A faster and more expensive cluster will improve throughput proportionately (We process 800 records per second for the model ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")
+
+The various latency metrics are explained below
+1. MESSAGING LATENCY - The number of milliseconds it takes for the message to arrive at a consumer after it was produced by the Kafka Producer
+2. PROCESSING DURATIONS ON ARRIVAL - The total number of milliseconds it takes to train and predict a feature record after it arrives at the Kafka Consumer. (PREDICTION DURATION ON ARRIVAL + LEARNING DURATION ON ARRIVAL)ß
+3. PREDICTION DURATION ON ARRIVAL - The total number of milliseconds it takes to make a prediction per feature record.
+4. LEARNING DURATION ON ARRIVAL - The total number of milliseconds it takes to train per feature record.
+5. END TO END DURATION = MESSAGING LATENCY + PROCESSING DURATIONS ON ARRIVAL
+
+
+
+It is important to note the minumum value of messaging latency
