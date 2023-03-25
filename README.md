@@ -99,11 +99,11 @@ A single thread achieves the following throughput numbers-
 Note how the messaging latency accounts for most of the latency. A faster and more expensive cluster will improve throughput proportionately (We process 800 records per second for the model ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")
 
 The various latency metrics are explained below
-1. MESSAGING LATENCY - The number of milliseconds it takes for the message to arrive at a consumer after it was produced by the Kafka Producer
-2. PROCESSING DURATIONS ON ARRIVAL - The total number of milliseconds it takes to train and predict a feature record after it arrives at the Kafka Consumer. (PREDICTION DURATION ON ARRIVAL + LEARNING DURATION ON ARRIVAL)ß
-3. PREDICTION DURATION ON ARRIVAL - The total number of milliseconds it takes to make a prediction per feature record.
-4. LEARNING DURATION ON ARRIVAL - The total number of milliseconds it takes to train per feature record.
-5. END TO END DURATION = MESSAGING LATENCY + PROCESSING DURATIONS ON ARRIVAL
+1. `MESSAGING LATENCY` - The number of milliseconds it takes for the message to arrive at a consumer after it was produced by the Kafka Producer
+2. `PROCESSING DURATIONS ON ARRIVAL` - The total number of milliseconds it takes to train and predict a feature record after it arrives at the Kafka Consumer. (`PREDICTION DURATION ON ARRIVAL` + `LEARNING DURATION ON ARRIVAL`)
+3. `PREDICTION DURATION ON ARRIVAL` - The total number of milliseconds it takes to make a prediction per feature record.
+4. `LEARNING DURATION ON ARRIVAL` - The total number of milliseconds it takes to train per feature record.
+5. `END TO END DURATION` = `MESSAGING LATENCY` + `PROCESSING DURATIONS ON ARRIVAL`
 
 
 
