@@ -16,3 +16,19 @@ event streaming platform and we used a managed hosted Kafka ([confluent](https:/
 it spins up containers on demand for running user workloads. The containers are based on Docker images, which are fully customizable. We used Domino to host the models and run scalability tests on hig velocity data generated as streams. 
 
 <img width="484" alt="technologies_used_river_domino" src="https://user-images.githubusercontent.com/27995832/113413633-6655d280-93bb-11eb-9f0d-d9674024d465.PNG">
+
+
+## High Level Overview 
+
+The notebook [MaxSustainableThroughputCalculator](src/MaxSustainableThroughputCalculator.ipynb) is a way to measure
+the maximum theoretical throughput if the cost of processing a messaging in the Kafka platform was zero.
+
+### Results for Maximum Sustainable Throughtput Calculations 
+Maximum sustainable throughput is the number of records we can train/predict in a single thread in 1 second
+|    | Classifier                      |   Avg Model Training Time(ms) |   Expected Train Time 1 million records (s) |   Expected time 1 million (mins) |   Max Training Throughput (sub-second-response)  |
+|---:|:--------------------------------|------------------------------:|--------------------------------------------:|---------------------------------:|-------------------------------------------------:|
+|  0 | HoeffdingAdaptiveTreeClassifier |                      1.81765  |                                    1817.65  |                        0.0119209 |                                              550 |
+|  1 | SRPClassifierHAT                |                     28.3744   |                                   28374.4   |                        0.0119209 |                                               35 |
+|  2 | SRPClassifierNaiveBayes         |                      4.33598  |                                    4335.98  |                        0.0119209 |                                              231 |
+|  3 | AdaptiveRandomForestClassifier  |                      1.02246  |                                    1022.46  |                        0.0119209 |                                              978 |
+|  4 | HalfSpaceTrees                  |                      0.221211 |                                     221.211 |                        0.0119209 |                                             4521 |
