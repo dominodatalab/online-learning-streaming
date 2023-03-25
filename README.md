@@ -63,7 +63,8 @@ The notebook [MaliciousURLModelProducer](src/MaliciousURLModelProducer.ipynb) pr
 feature topic.
 
 This cell in the notebook throttle the number of features pushed to a topic
-'''
+
+```
 #Feature Topic
 feature_topic = 'features_v4'
 
@@ -78,6 +79,6 @@ max_size=5000
 #Dataset used
 dataset = datasets.MaliciousURL()
 data = dataset.take(max_size)
-'''
+```
 
 
