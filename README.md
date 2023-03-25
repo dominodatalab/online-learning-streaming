@@ -23,12 +23,33 @@ it spins up containers on demand for running user workloads. The containers are 
 The notebook [MaxSustainableThroughputCalculator](src/MaxSustainableThroughputCalculator.ipynb) is a way to measure
 the maximum theoretical throughput if the cost of processing a messaging in the Kafka platform was zero.
 
-### Results for Maximum Sustainable Throughtput Calculations 
-Maximum sustainable throughput is the number of records we can train/predict in a single thread in 1 second
-|    | Classifier                      |   Avg Model Training Time(ms) |   Expected Train Time 1 million records (s) |   Expected time 1 million (mins) |   Max Training Throughput (sub-second-response)  |
-|---:|:--------------------------------|------------------------------:|--------------------------------------------:|---------------------------------:|-------------------------------------------------:|
-|  0 | HoeffdingAdaptiveTreeClassifier |                      1.81765  |                                    1817.65  |                        0.0119209 |                                              550 |
-|  1 | SRPClassifierHAT                |                     28.3744   |                                   28374.4   |                        0.0119209 |                                               35 |
-|  2 | SRPClassifierNaiveBayes         |                      4.33598  |                                    4335.98  |                        0.0119209 |                                              231 |
-|  3 | AdaptiveRandomForestClassifier  |                      1.02246  |                                    1022.46  |                        0.0119209 |                                              978 |
-|  4 | HalfSpaceTrees                  |                      0.221211 |                                     221.211 |                        0.0119209 |                                             4521 |
+## Results for Maximum Sustainable Throughtput Calculations 
+
+We present three types of calculations -
+1. Throughput for training alone - This is relevant in practice because online training occurs in a separate process when the ground truth arrives. It is used along with the features used for scoring, the score and the ground truth
+2. Throughput for predictions alone - This is relevant in practice because predictions/scoring occurs on a deployed model on a stream
+3. Throughput for training and prediction - This is simply to provide the maximum possible throughput we can hope to achieve if perform training and predictions in the same thread where the features, predictions are stored with the identifier for the feature (ex. Credit Card Number and Transaction Id) and the ground truth is routed to the same processing partition (Kafka Part
+
+### Maximum sustainable throughput for training
+|    | Classifier                      |   Expected Time(ms) Per Record |   Expected Time Million Records (s) |   Expected Time Million Records (mins) |   Max Prediction Throughput (sub-second-response)  |
+|---:|:--------------------------------|-------------------------------:|------------------------------------:|---------------------------------------:|---------------------------------------------------:|
+|  0 | HoeffdingAdaptiveTreeClassifier |                       1.82165  |                            1821.65  |                                30.3608 |                                                549 |
+|  1 | SRPClassifierHAT                |                      28.2629   |                           28262.9   |                               471.048  |                                                 35 |
+|  2 | SRPClassifierNaiveBayes         |                       4.40596  |                            4405.96  |                                73.4326 |                                                227 |
+|  3 | AdaptiveRandomForestClassifier  |                       0.953638 |                             953.638 |                                15.894  |                                               1049 |
+
+### Maximum sustainable throughput for inference
+|    | Classifier                      |   Expected Time(ms) Per Record |   Expected Time Million Records (s) |   Expected Time Million Records (mins) |   Max Prediction Throughput (sub-second-response)  |
+|---:|:--------------------------------|-------------------------------:|------------------------------------:|---------------------------------------:|---------------------------------------------------:|
+|  0 | HoeffdingAdaptiveTreeClassifier |                       0.568018 |                             568.018 |                                9.46696 |                                               1761 |
+|  1 | SRPClassifierHAT                |                       1.21962  |                            1219.62  |                               20.3269  |                                                820 |
+|  2 | SRPClassifierNaiveBayes         |                       1.16247  |                            1162.47  |                               19.3745  |                                                860 |
+|  3 | AdaptiveRandomForestClassifier  |                       0.199434 |                             199.434 |                                3.32389 |                                               5014 |
+
+### Maximum sustainable throughput for training and inference together
+|    | Classifier                      |   Expected Time(ms) Per Record |   Expected Time Million Records (s) |   Expected Time Million Records (mins) |   Max Prediction Throughput (sub-second-response)  |
+|---:|:--------------------------------|-------------------------------:|------------------------------------:|---------------------------------------:|---------------------------------------------------:|
+|  0 | HoeffdingAdaptiveTreeClassifier |                        2.38967 |                             2389.67 |                                39.8278 |                                                418 |
+|  1 | SRPClassifierHAT                |                       29.4825  |                            29482.5  |                               491.375  |                                                 34 |
+|  2 | SRPClassifierNaiveBayes         |                        5.56843 |                             5568.43 |                                92.8071 |                                                180 |
+|  3 | AdaptiveRandomForestClassifier  |                        1.15307 |                             1153.07 |                                19.2179 |                                                867 |
