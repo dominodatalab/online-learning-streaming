@@ -29,7 +29,7 @@ the maximum theoretical throughput if the cost of processing a messaging in the 
 We present three types of calculations -
 1. Throughput for training alone - This is relevant in practice because online training occurs in a separate process when the ground truth arrives. It is used along with the features used for scoring, the score and the ground truth
 2. Throughput for predictions alone - This is relevant in practice because predictions/scoring occurs on a deployed model on a stream
-3. Throughput for training and prediction - This is simply to provide the maximum possible throughput we can hope to achieve if perform training and predictions in the same thread where the features, predictions are stored with the identifier for the feature (ex. Credit Card Number and Transaction Id) and the ground truth is routed to the same processing partition (Kafka Part
+3. Throughput for training and prediction - This is simply to provide the maximum possible throughput we can hope to achieve if perform training and predictions in the same thread where the features, predictions are stored with the identifier for the feature (ex. Credit Card Number and Transaction Id) and the ground truth is routed to the same processing partition (Kafka Partition)
 
 #### Maximum sustainable throughput for training
 |    | Classifier                      |   Expected Time(ms) Per Record |   Expected Time Million Records (s) |   Expected Time Million Records (mins) |   Max Prediction Throughput (sub-second-response)  |
