@@ -9,13 +9,12 @@ This repository is the official implementation of the paper **StreamMLOps: Onlin
 > [River](https://github.com/online-ml/river) [[1]](#1) is an open-source online machine learning library written in Python which main focus is **instance-incremental
 learning**, meaning that every component (estimators, transformers, performance metrics, etc.) is designed to be updated one sample at a time. We used River to continuously train and update online learning model from last data streams. 
 
-> The [Domino Platform](https://www.dominodatalab.com/) platform is implemented on top of Kubernetes, where
-it spins up containers on demand for running user workloads. The containers are based on Docker images, which are fully customizable. We used Domino to host the models and run scalability tests on high velocity data generated as streams. 
-
 > [KAFKA](https://kafka.apache.org/) is 
 a state of the art open-source distributed
-event streaming platform and we used a managed hosted Kafka ([confluent](https://www.confluent.io/). We used Kafka as our streaming platform
+event streaming platform and we used a managed hosted Kafka ([confluent](https://www.confluent.io/). We used it as a data streams generator.
 
+> The [Domino Platform](https://www.dominodatalab.com/) platform is implemented on top of Kubernetes, where
+it spins up containers on demand for running user workloads. The containers are based on Docker images, which are fully customizable. We used Domino to host the models and run scalability tests on hig velocity data generated as streams. 
 
 <img width="484" alt="technologies_used_river_domino" src="https://user-images.githubusercontent.com/27995832/113413633-6655d280-93bb-11eb-9f0d-d9674024d465.PNG">
 
@@ -30,7 +29,7 @@ the maximum theoretical throughput if the cost of processing a messaging in the 
 We present three types of calculations -
 1. Throughput for training alone - This is relevant in practice because online training occurs in a separate process when the ground truth arrives. It is used along with the features used for scoring, the score and the ground truth
 2. Throughput for predictions alone - This is relevant in practice because predictions/scoring occurs on a deployed model on a stream
-3. Throughput for training and prediction - This is simply to provide the maximum possible throughput we can hope to achieve if perform training and predictions in the same thread where the features, predictions are stored with the identifier for the feature (ex. Credit Card Number and Transaction Id) and the ground truth is routed to the same processing partition (Kafka Partition)
+3. Throughput for training and prediction - This is simply to provide the maximum possible throughput we can hope to achieve if perform training and predictions in the same thread where the features, predictions are stored with the identifier for the feature (ex. Credit Card Number and Transaction Id) and the ground truth is routed to the same processing partition (Kafka Part
 
 #### Maximum sustainable throughput for training
 |    | Classifier                      |   Expected Time(ms) Per Record |   Expected Time Million Records (s) |   Expected Time Million Records (mins) |   Max Prediction Throughput (sub-second-response)  |
@@ -119,7 +118,7 @@ We are sending approximately 800 messages per second to account for the messagin
 ## Practical Scenario
 
 In a practical scenario when Online Learning is applied to a regulated industry like Finance or Healthcare the above
-simple architecture will not work. Non-functional requirements like Explainability and Reproducibility are important.
+simple architecture will not work. Non-functional requirements like Model Explainability, Model versioning and Prediction Reproducibility are important.
 
 Consequently, we won't be able to train and predict in the same thread. Instead we will be training in a separate thread and publishing the model version to model registry (MLflow based Experiment Manager in Domino Data Lab Platform) and publishing the versions to all the Kafka Consumers responsible for the predictions.
 
