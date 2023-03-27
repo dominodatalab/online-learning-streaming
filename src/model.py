@@ -184,6 +184,7 @@ def consume_features(group_id:str):
 
 
 def predict(x):
+    print('Now predicting')
     global model_artifact
     model_score = model_artifact.predict_one(x)
     print(model_score)
