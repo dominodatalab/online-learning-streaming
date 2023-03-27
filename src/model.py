@@ -273,5 +273,5 @@ def test_init(model):
 #print('Sleeping for 1 seconds')
 #time.sleep(1)
 
-#init()
+init()
 #print('Started Model')
