@@ -200,9 +200,9 @@ def predict(x):
 def init():   
     global GROUP_ID
     consume_features(GROUP_ID)
-    #cf = threading.Thread(target=consume_features, args=(GROUP_ID,))
-    #cf.start()
-    #consume_features(inference_group_id)
+    cf = threading.Thread(target=consume_features, args=(GROUP_ID,))
+    cf.start()
+    consume_features(inference_group_id)
 
 #print('Sleeping for 1 seconds')
 #time.sleep(1)
