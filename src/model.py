@@ -110,8 +110,7 @@ def consume_features(group_id:str):
     mem_usage = []
     end_to_end_processing_durations = []
     messaging_latencies = []
-    while(True):           
-       
+    while(True):
         messages = features_consumer.consume(num_messages=1000,timeout=0.1)    
         if len(messages)==0: continue
         
@@ -179,10 +178,6 @@ def consume_features(group_id:str):
     features_consumer.close() 
     
     
-    
-   
-
-
 def predict(x):
     print('Now predicting')
     global model_artifact
