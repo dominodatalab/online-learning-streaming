@@ -70,7 +70,7 @@ def get_latest_model(group_id):
     sleep_time = 1
     while(True):
         
-        if(cnt>4): break
+        #if(cnt>4): break
         messages = model_update_consumer.consume(num_messages=1,timeout=0.1)    
         for msg in messages:
             cnt = cnt + 1
