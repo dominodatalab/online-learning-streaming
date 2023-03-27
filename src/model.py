@@ -8,15 +8,15 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-FEATURE_TOPIC=os.environ['FEATURE_TOPIC']
-GROUP_ID = os.environ['INFERENCE_GROUP_ID']
-PREDICTION_TOPIC = os.environ['PREDICTION_TOPIC']
+FEATURE_TOPIC=os.environ.get('FEATURE_TOPIC','features')
+GROUP_ID = os.environ.get('INFERENCE_GROUP_ID','unit-test')
+PREDICTION_TOPIC = os.environ.get('PREDICTION_TOPIC','predictions')
 KAFKA_BOOTSTRAP_SERVERS = os.environ.get('kafka_bootstrap_servers')
 KAFKA_USERNAME = os.environ.get('kafka_username')
 KAFKA_PASSWORD = os.environ.get('kafka_password')
+MODEL_UPDATE_TOPIC = os.environ.get('MODEL_UPDATE_TOPIC','model_updates')
 
-
-
+import sys
 import time
 import os
 import json
@@ -36,27 +36,72 @@ from river import compose
 from river import datasets
 from river import metrics
 from river import preprocessing
-
+import uuid
+import pickle
+import codecs
 
 
 latest_version=-1
 models = {}
-
-
 
 def return_range(strg, loc, toks):
     if len(toks)==1:
         return int(toks[0])
     else:
         return range(int(toks[0]), int(toks[1])+1)
-
-
-
-model_artifact = ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")
-
 cnt = 0
+def get_latest_model(group_id): 
+    global latest_version    
+    global models
+    attempt=1    
+    model_update_consumer_conf = {'bootstrap.servers': KAFKA_BOOTSTRAP_SERVERS,
+                     'sasl.username': KAFKA_USERNAME,
+                     'sasl.password': KAFKA_PASSWORD,
+                     'sasl.mechanism': 'PLAIN',
+                     'security.protocol': 'SASL_SSL',
+                     'ssl.ca.location': certifi.where(),
+                     'group.id': str(uuid.uuid1()),
+                     'enable.auto.commit': False,
+                     'auto.offset.reset': 'earliest'}
+    model_update_consumer = Consumer(model_update_consumer_conf)
+    model_update_consumer.subscribe([MODEL_UPDATE_TOPIC])    
+    cnt = 0 
+    elapsed_time = 0
+    sleep_time = 1
+    while(True):
+        
+        if(cnt>4): break
+        messages = model_update_consumer.consume(num_messages=1,timeout=0.1)    
+        for msg in messages:
+            cnt = cnt + 1
+            if msg.error():
+                if msg.error().code() == KafkaError._PARTITION_EOF:
+                    sys.stderr.write('%% %s [%d] reached end at offset %d\n' %
+                                    (msg.topic(), msg.partition(), msg.offset()))
+                elif msg.error():
+                    sys.stderr.write(f'Error code{msg.error().code()} \n')
+            else:                
+                model_json = json.loads(msg.value().decode("utf-8"))
+                picked_str=model_json['m']
+                model_instance = pickle.loads(codecs.decode(model_json['m'].encode(), "base64"))
+                model_version = int(model_json['v'])
+                print(f'Retrived - {model_version}')
+                models[model_version]=model_instance
+                if(model_version>latest_version):
+                    latest_version = model_version
+        
+        time.sleep(sleep_time)
+        elapsed_time = elapsed_time + sleep_time
+        if(elapsed_time%20==0):
+            print(f'Running for {elapsed_time} s')
+            
+    print('Returning')
 
-import sys
+
+
+    
+    
+
 def consume_features(group_id:str):  
     ignored = 0
     global cnt
@@ -178,23 +223,54 @@ def consume_features(group_id:str):
     features_consumer.close() 
     
     
-def predict(x):
-    print('Now predicting')
-    global model_artifact
-    model_score = model_artifact.predict_one(x)
-    print(model_score)
-    return dict(score=str(model_score),features=x,count=str(cnt), model=str(model_artifact), model_version=str(0))
+def predict(x,version=-1):    
+    global latest_version
+    global  models
+    if version<0:
+        version = latest_version
+    if(version>=0):        
+        score = models[version].predict_one(x)
+        return dict(features=x, score=str(score),model_version=str(version))
+    else:
+        return dict(score=-1,model_version=latest_version,error='No model initialized')
+    
+def initialize_basic_default_model():
+    global latest_version
+    global models
+    #Initialize a very basic model
+    max_size=1000
+    model_artifact = ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")
+    dataset = datasets.MaliciousURL()
+    data = dataset.take(max_size)
+    for f, y in data:
+        model_artifact = model_artifact.learn_one(f,y)
+    latest_version = 0
+    models[latest_version]=model_artifact
+    
 
 def init():   
     global GROUP_ID
+    initialize_basic_default_model()
+    print('Initialized basic model')
+    model_updates_grp_id = str(uuid.uuid1())
     print('Now initializing')
+    cf = threading.Thread(target=get_latest_model, args=(model_updates_grp_id,))
+    cf.start()
+    print('Done initializing model update thread')
+    
     cf = threading.Thread(target=consume_features, args=(GROUP_ID,))
     cf.start()
-    print('Done initializing')
+    print('Done initializing features consumer thread')
+    
+def test_init(model):
+    global models
+    #model_artifact = ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")
+    latest_version = 1
+    models[latest_version]=model
     
 
 #print('Sleeping for 1 seconds')
 #time.sleep(1)
 
-init()
-print('Started Model')
+#init()
+#print('Started Model')
