@@ -57,7 +57,7 @@ model_artifact = tree.HoeffdingAdaptiveTreeClassifier(grace_period=100,  delta=1
 model_artifact = ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")
 
 cnt = 0
-max_messages=5000
+
 import sys
 def consume_features(group_id:str):  
     ignored = 0
@@ -113,8 +113,7 @@ def consume_features(group_id:str):
     end_to_end_processing_durations = []
     messaging_latencies = []
     while(True):           
-        if(cnt>0 and cnt%max_messages==0):
-            break;
+       
         messages = features_consumer.consume(num_messages=1000,timeout=0.1)    
         if len(messages)==0: continue
         
@@ -170,8 +169,7 @@ def consume_features(group_id:str):
                         new_message = (model_artifact._raw_memory_usage)     
                         predictions_producer.flush()
                     
-                    if(cnt>max_messages):
-                        break;
+                
                 except Exception as  e:      
                     print(e)
                     ignored = ignored + 1
