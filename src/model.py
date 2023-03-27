@@ -104,9 +104,9 @@ def get_latest_model(group_id):
 
 def consume_features(group_id:str):  
     ignored = 0
+    global models
     global cnt
-    global latest_version
-    global model_artifact
+    global latest_version    
     global KAFKA_USER_NAME
     global KAFKA_PASSWORD
     global KAFKA_BOOTSTRAP_SERVERS
@@ -188,10 +188,11 @@ def consume_features(group_id:str):
                     
                     new_message['msg_l']=(msg_arrival_time-msg_produce_ts)
                                 
-                    st_learn_ts = time.time()
-                    model_artifact = model_artifact.learn_one(f,y)      
-                    end_learn_ts = time.time()
-                    new_message['l_dur'] = (end_learn_ts-st_learn_ts)
+                    #st_learn_ts = time.time()
+                    #model_artifact = model_artifact.learn_one(f,y)      
+                    #end_learn_ts = time.time()
+                    #new_message['l_dur'] = (end_learn_ts-st_learn_ts)
+                    model_artifact = models[latest_version]
                         
                     st_prediction_time = time.time()            
                     score = model_artifact.predict_one(f)
