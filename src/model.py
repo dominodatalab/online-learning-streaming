@@ -198,13 +198,14 @@ def predict(x):
     return dict(score=str(model_score),features=x,count=str(cnt), model=str(model_score))
 
 def init():   
-    global inference_group_id
-    cf = threading.Thread(target=consume_features, args=(GROUP_ID,))
-    cf.start()
+    global GROUP_ID
+    consume_feaures(GROUP_ID)
+    #cf = threading.Thread(target=consume_features, args=(GROUP_ID,))
+    #cf.start()
     #consume_features(inference_group_id)
 
-print('Sleeping for 1 seconds')
-time.sleep(1)
+#print('Sleeping for 1 seconds')
+#time.sleep(1)
 
 init()
 print('started')
