@@ -183,7 +183,7 @@ def predict(x):
     global model_artifact
     model_score = model_artifact.predict_one(x)
     print(model_score)
-    return dict(score=str(model_score),features=x,count=str(cnt), model=str(model_score))
+    return dict(score=str(model_score),features=x,count=str(cnt), model=str(model_artifact), model_version=str(0))
 
 def init():   
     global GROUP_ID
