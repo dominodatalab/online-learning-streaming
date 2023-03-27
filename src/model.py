@@ -51,9 +51,7 @@ def return_range(strg, loc, toks):
         return range(int(toks[0]), int(toks[1])+1)
 
 
-'''
-model_artifact = tree.HoeffdingAdaptiveTreeClassifier(grace_period=100,  delta=1e-5, leaf_prediction='nb', nb_threshold=10,seed=0) 
-'''
+
 model_artifact = ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")
 
 cnt = 0
@@ -186,11 +184,7 @@ def consume_features(group_id:str):
 
 
 def predict(x):
-    global cnt
     global model_artifact
-    global started
-    if(not started):
-        init()        
     model_score = model_artifact.predict_one(x)
     print(model_score)
     return dict(score=str(model_score),features=x,count=str(cnt), model=str(model_score))
