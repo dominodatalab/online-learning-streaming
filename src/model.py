@@ -193,9 +193,9 @@ def predict(x):
 def init():   
     global GROUP_ID
     print('Now initializing')
-    consume_features(GROUP_ID)
     cf = threading.Thread(target=consume_features, args=(GROUP_ID,))
     cf.start()
+    print('Done initializing')
     
 
 #print('Sleeping for 1 seconds')
