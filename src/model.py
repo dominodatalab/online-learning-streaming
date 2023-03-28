@@ -12,7 +12,7 @@ FEATURE_TOPIC=os.environ.get('FEATURE_TOPIC','features')
 GROUP_ID = os.environ.get('INFERENCE_GROUP_ID','unit-test')
 PREDICTION_TOPIC = os.environ.get('PREDICTION_TOPIC','predictions')
 KAFKA_BOOTSTRAP_SERVERS = os.environ.get('KAFKA_BOOTSTRAP_SERVERS')
-KAFKA_USERNAME = os.environ.get('KAFKA_USERNAME')
+KAFKA_USERNAME = os.environ.get('KAFKA_USER_NAME')
 KAFKA_PASSWORD = os.environ.get('KAFKA_PASSWORD')
 MODEL_UPDATE_TOPIC = os.environ.get('MODEL_UPDATE_TOPIC','model_updates')
 
