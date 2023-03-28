@@ -206,6 +206,7 @@ def consume_features(group_id:str):
                     new_message['p_dur'] = (msg_departure_time-msg_arrival_time)
                     end_to_end_processing_durations.append(msg_departure_time-msg_produce_ts)
                     new_message['e_e_dur']= (msg_departure_time-msg_produce_ts)
+                    new_message['version']= latest_version
                     predictions_producer.produce(PREDICTION_TOPIC,value=json.dumps(new_message).encode('utf-8'), key=str(cnt))  
                     if(cnt%1000==0):
                         print(f'Processed {cnt}')
