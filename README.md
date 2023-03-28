@@ -130,4 +130,18 @@ The high level architecture for this design is show below:
 
 //Watch this REPO for demonstrations using the above architecture]
 
+In order to test this figure run the following notebooks-
+
+1. Run the notebook [DominoModelPublish](src/DominoModelPublish.ipynb) to publish a Domino model endpoint. By default it publishes a deployment with 2 replicas. You can change it from the endpoint management screen. The published model is the file  [model.py](src/model.py). The api endpoint is the function `predict` in the file. You can invoke the endpoint using a two attributes `x` which is a feature set and `version` which is the model version published via a MLflow experiment in the notebook [PublishModelUpdates](src/PublishModelUpdates.ipynb). More on that later. An example payload is in the file [example_payload.json](test/example_payload.json). When you deploy the model intially no OnlineModel instance has been published yet and the response would reflect that if you make and API call.
+
+2. Next run the notebook [PublishModelUpdates](src/PublishModelUpdates.ipynb). This notebook does the following:
+    a. Creates and MLflow experiment using the Domino Experiment Manager
+    b. Executes 6 runs consecutively and stores the incremental model artifacts and model metrics
+    c. Registers the product of each run into the Model Registry as a new version ranging from 1-6
+    d. Publishes the model artifact to the Kafka topic `model-updates`
+    
+3. The role of the model endpoint published in step (1) is three fold-
+    a. Listen for model updates on a specific dedicated topic and save each model instance by version number
+    b. Listen to the `features` topic and consume features and make `predictions` using the latest model version. Next it publishes the score and model version used to score to the `predictions` topic. **Now assume that the feature set was indexed by something like a transaction id in a Credit Card Fraud detection use-case. You could also save the transaction id to be prediciton message and match later with the feature set used to make the prediction** Now you can use this incremental dataset to produce a new model version, save the incremental dataset used to generate the model version in MLflow run. Because the prediction was saved with the model version used to create it, you can using the Experiment Manager and Model Registry reliably reproduce both the model version as well as the prediction.
+    c. Provide a model endpoint when provided the features payload using the latest model version. Or using the specific version requested.
 
