@@ -11,9 +11,9 @@ logging.basicConfig(level=logging.INFO)
 FEATURE_TOPIC=os.environ.get('FEATURE_TOPIC','features')
 GROUP_ID = os.environ.get('INFERENCE_GROUP_ID','unit-test')
 PREDICTION_TOPIC = os.environ.get('PREDICTION_TOPIC','predictions')
-KAFKA_BOOTSTRAP_SERVERS = os.environ.get('kafka_bootstrap_servers')
-KAFKA_USERNAME = os.environ.get('kafka_username')
-KAFKA_PASSWORD = os.environ.get('kafka_password')
+KAFKA_BOOTSTRAP_SERVERS = os.environ.get('KAFKA_BOOTSTRAP_SERVERS')
+KAFKA_USERNAME = os.environ.get('KAFKA_USERNAME')
+KAFKA_PASSWORD = os.environ.get('KAFKA_PASSWORD')
 MODEL_UPDATE_TOPIC = os.environ.get('MODEL_UPDATE_TOPIC','model_updates')
 
 import sys
