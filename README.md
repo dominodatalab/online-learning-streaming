@@ -128,4 +128,6 @@ The high level architecture for this design is show below:
 
 ![Kafka Model](assets/kafka_model.png)
 
-//Watch this REPO for demonstrations using the above architecture
+//Watch this REPO for demonstrations using the above architecture]
+
+
