@@ -119,6 +119,7 @@ def consume_features(group_id:str):
                      'security.protocol': 'SASL_SSL',
                      'ssl.ca.location': certifi.where(),
                      'group.id': group_id,
+                     'debug' : 'security,broker'
                      'enable.auto.commit': True,
                      'auto.commit.interval.ms':1000,         
                      'auto.offset.reset': 'latest'}
@@ -133,6 +134,7 @@ def consume_features(group_id:str):
                      'sasl.username': KAFKA_USERNAME,
                      'sasl.password': KAFKA_PASSWORD,
                      'sasl.mechanism': 'PLAIN',
+                     'debug' : 'security,broker'
                      'security.protocol': 'SASL_SSL',
                      'batch.num.messages': 2048,                
                      'linger.ms': 100,
