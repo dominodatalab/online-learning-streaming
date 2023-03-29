@@ -242,10 +242,10 @@ def initialize_basic_default_model():
     #Initialize a very basic model
     max_size=1000
     model_artifact = ensemble.AdaptiveRandomForestClassifier(leaf_prediction="mc")
-    dataset = datasets.MaliciousURL()
-    data = dataset.take(max_size)
-    for f, y in data:
-        model_artifact = model_artifact.learn_one(f,y)
+    #dataset = datasets.MaliciousURL()
+    #data = dataset.take(max_size)
+    #for f, y in data:
+    #    model_artifact = model_artifact.learn_one(f,y)
     latest_version = 0
     models[latest_version]=model_artifact
     
